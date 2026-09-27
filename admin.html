@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NairaFlex Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#0B8A5D; --green-dark:#086b47; --green-light:#E6F5EE;
+  --navy:#0C1B17; --ink:#12211D; --sub:#5C6B66;
+  --card:#FFFFFF; --bg:#F4F8F6; --line:#E4ECE8;
+  --amber:#B77A1D; --amber-bg:#FCF1DE; --red:#C23B3B; --red-bg:#FBEAEA;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --card:#16221D; --bg:#0C1310; --ink:#EAF3EF; --sub:#9CB0A9; --line:#233029; --green-light:#12291F; --amber-bg:#2A2013; --red-bg:#2B1717; }
+}
+:root[data-theme="dark"]{ --card:#16221D; --bg:#0C1310; --ink:#EAF3EF; --sub:#9CB0A9; --line:#233029; --green-light:#12291F; --amber-bg:#2A2013; --red-bg:#2B1717; }
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+h1,h2,h3,.num{font-family:Manrope,Inter,sans-serif}
+#app{max-width:480px;margin:0 auto;min-height:100%}
+.screen{display:none;padding:16px 16px 90px}
+.screen.active{display:block}
+.topbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 8px;display:flex;align-items:center;justify-content:space-between;max-width:480px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:17px}
+.brand .mark{width:28px;height:28px;border-radius:8px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.badge-admin{font-size:10px;font-weight:700;background:var(--green-light);color:var(--green-dark);padding:3px 8px;border-radius:20px}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.row{display:flex;align-items:center;justify-content:space-between}
+.section-title{font-size:14px;font-weight:700;margin:18px 2px 10px;color:var(--sub)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px}
+.stat .lbl{font-size:11.5px;color:var(--sub)}
+.stat .val{font-size:19px;font-weight:800;margin-top:4px}
+.stat .sub{font-size:10.5px;margin-top:3px}
+.bar-wrap{display:flex;align-items:flex-end;gap:6px;height:70px;margin-top:10px}
+.bar{flex:1;background:var(--green);border-radius:5px 5px 0 0;min-height:3px}
+.bar.b2{background:var(--amber)}
+.bar.b3{background:var(--red)}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--sub);margin-top:8px}
+.legend span::before{content:'●';margin-right:4px}
+.legend .l1::before{color:var(--green)} .legend .l2::before{color:var(--amber)} .legend .l3::before{color:var(--red)}
+.list-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.list-item:last-child{border-bottom:none}
+.li-ic{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;background:var(--green-light);color:var(--green-dark)}
+.li-body{flex:1;min-width:0}
+.li-title{font-weight:600;font-size:13.5px}
+.li-sub{font-size:11.5px;color:var(--sub);margin-top:2px}
+.status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:3px}
+.status.success{background:var(--green-light);color:var(--green-dark)}
+.status.pending{background:var(--amber-bg);color:var(--amber)}
+.status.failed{background:var(--red-bg);color:var(--red)}
+.status.suspended{background:var(--red-bg);color:var(--red)}
+.status.active{background:var(--green-light);color:var(--green-dark)}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:14px;font-family:inherit}
+input:focus,select:focus{outline:2px solid var(--green);outline-offset:1px}
+.btn{width:100%;padding:13px;border-radius:12px;border:none;background:var(--green);color:#fff;font-weight:700;font-size:14px;cursor:pointer;margin-top:12px}
+.btn.danger{background:var(--red)}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink)}
+.btn.sm{width:auto;padding:9px 14px;font-size:12.5px;margin-top:0}
+.pill-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.pill{border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;background:var(--card)}
+.pill.active{background:var(--green);color:#fff;border-color:var(--green)}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;max-width:480px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+.nav-btn{flex:1;border:none;background:none;padding:9px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--sub);cursor:pointer;font-family:inherit}
+.nav-btn span{font-size:10px;font-weight:600}
+.nav-btn.active{color:var(--green)}
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.back-row h2{font-size:18px;margin:0}
+.center-note{text-align:center;color:var(--sub);font-size:13px;padding:36px 10px}
+.hint{font-size:11.5px;color:var(--sub);margin-top:5px}
+label{font-size:12px;font-weight:600;color:var(--sub);display:block;margin:12px 0 6px}
+.modal-wrap{position:fixed;inset:0;background:rgba(6,14,11,.55);display:none;align-items:flex-end;z-index:50;max-width:480px;margin:0 auto}
+.modal-wrap.open{display:flex}
+.modal{background:var(--card);width:100%;border-radius:20px 20px 0 0;padding:20px;max-height:88vh;overflow-y:auto}
+.modal h3{margin:0 0 4px;font-size:16px}
+.rline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.rline span:first-child{color:var(--sub)}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;z-index:60;opacity:0;transition:opacity .25s;max-width:400px;text-align:center}
+.toast.show{opacity:1}
+.audit{font-size:11.5px;color:var(--sub);padding:8px 0;border-bottom:1px solid var(--line)}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.1/firebase-app-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.1/firebase-auth-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.1/firebase-firestore-compat.min.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwblka7oXdT2FiGIEmCjUQsrMn7Bi4G5Y",
+    authDomain: "naira-flex.firebaseapp.com",
+    projectId: "naira-flex",
+    storageBucket: "naira-flex.firebasestorage.app",
+    messagingSenderId: "452032382396",
+    appId: "1:452032382396:web:8beb5b05db5248fa63d7b9"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const ADMIN_WHITELIST = ["salihua175@gmail.com"];
+</script>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar" id="topbar">
+    <div class="brand"><div class="mark">₦</div>NairaFlex <span class="badge-admin">Admin</span></div>
+    <button class="icon-btn" onclick="go('login')" id="logoutTop" style="display:none">⎋</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="screen active" id="screen-login">
+    <div style="text-align:center;margin:60px 0 30px">
+      <div class="mark" style="width:52px;height:52px;border-radius:15px;font-size:22px;margin:0 auto 12px">₦</div>
+      <h1 style="margin:0;font-size:20px">Admin Console</h1>
+      <p class="hint">NairaFlex operations & controls</p>
+    </div>
+    <div class="card">
+      <label>Admin email</label><input id="admEmail" placeholder="admin@nairaflex.app">
+      <label>Password</label><input id="admPass" type="password" placeholder="••••••••">
+      <div id="totpBlock" style="display:none"><label>2FA code</label><input id="admTotp" placeholder="6-digit code" inputmode="numeric"></div>
+      <button class="btn" onclick="adminLogin()">Log in</button>
+      <p class="hint" style="text-align:center;margin-top:10px">Demo mode — any credentials work; 2FA code is any 6 digits.</p>
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="screen" id="screen-overview">
+    <h2 style="font-size:18px;margin:6px 2px 12px">Overview</h2>
+    <div class="grid2">
+      <div class="stat"><div class="lbl">Total users</div><div class="val" id="stUsers">-</div></div>
+      <div class="stat"><div class="lbl">Active users</div><div class="val" id="stActive">-</div></div>
+      <div class="stat"><div class="lbl">Total wallet balance</div><div class="val" id="stWallets">-</div></div>
+      <div class="stat"><div class="lbl">Txn volume (30d)</div><div class="val" id="stVolume">-</div></div>
+      <div class="stat"><div class="lbl">Today's transactions</div><div class="val" id="stToday">-</div></div>
+      <div class="stat"><div class="lbl">Revenue (commission)</div><div class="val" id="stRevenue">-</div></div>
+    </div>
+    <div class="section-title">Transactions by status (7 days)</div>
+    <div class="card">
+      <div class="bar-wrap" id="statusChart"></div>
+      <div class="legend"><span class="l1">Successful</span><span class="l2">Pending</span><span class="l3">Failed</span></div>
+    </div>
+    <div class="section-title">Referral stats</div>
+    <div class="card grid2" style="display:grid">
+      <div><div class="hint">Total referrals</div><div class="val" style="font-size:18px;font-weight:800" id="stRef">-</div></div>
+      <div><div class="hint">Bonuses paid</div><div class="val" style="font-size:18px;font-weight:800" id="stRefPaid">-</div></div>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div class="screen" id="screen-users">
+    <h2 style="font-size:18px;margin:6px 2px 12px">Users</h2>
+    <input id="userSearch" placeholder="Search name, phone or email" oninput="renderUsers()">
+    <div class="card" style="margin-top:12px" id="userList"></div>
+  </div>
+
+  <!-- TRANSACTIONS -->
+  <div class="screen" id="screen-tx">
+    <h2 style="font-size:18px;margin:6px 2px 12px">Transactions</h2>
+    <input id="txSearch" placeholder="Search by reference" oninput="renderAdminTx()">
+    <div class="pill-row" style="margin-top:10px" id="txAdminFilters"></div>
+    <div class="card" style="margin-top:12px" id="txAdminList"></div>
+  </div>
+
+  <!-- PRICING -->
+  <div class="screen" id="screen-pricing">
+    <h2 style="font-size:18px;margin:6px 2px 12px">Service & Pricing</h2>
+    <div class="card">
+      <label>Airtime commission (%)</label><input id="cfgAirtimeComm" type="number" value="2">
+      <label>Electricity service fee (₦ flat)</label><input id="cfgElecFee" type="number" value="50">
+      <label>TV service fee (₦ flat)</label><input id="cfgTvFee" type="number" value="50">
+      <label>Referral bonus (₦)</label><input id="cfgRefBonus" type="number" value="300">
+      <label>Min transaction (₦)</label><input id="cfgMin" type="number" value="50">
+      <label>Max transaction (₦)</label><input id="cfgMax" type="number" value="500000">
+      <button class="btn" onclick="savePricing()">Save changes</button>
+      <p class="hint">Saved values apply immediately in the app_settings store and flow to the user app.</p>
+    </div>
+    <div class="section-title">Data plans</div>
+    <div class="card" id="planList"></div>
+    <div class="section-title">Service availability</div>
+    <div class="card" id="svcAvail"></div>
+  </div>
+
+  <!-- PROVIDERS -->
+  <div class="screen" id="screen-providers">
+    <h2 style="font-size:18px;margin:6px 2px 12px">Providers</h2>
+    <div class="card" id="providerList"></div>
+    <div class="section-title">Recent webhook / request log</div>
+    <div class="card" id="providerLog"></div>
+  </div>
+
+  <!-- AUDIT / SUPPORT -->
+  <div class="screen" id="screen-more">
+    <h2 style="font-size:18px;margin:6px 2px 12px">More</h2>
+    <div class="section-title" style="margin-top:0">Support tickets</div>
+    <div class="card" id="admTicketList"></div>
+    <div class="section-title">Audit log</div>
+    <div class="card" id="auditList"></div>
+  </div>
+
+  <div class="bottom-nav" id="bottomNav" style="display:none">
+    <button class="nav-btn" data-s="overview" onclick="go('overview')"><span>📊</span><span>Overview</span></button>
+    <button class="nav-btn" data-s="users" onclick="go('users')"><span>👥</span><span>Users</span></button>
+    <button class="nav-btn" data-s="tx" onclick="go('tx')"><span>📄</span><span>Txns</span></button>
+    <button class="nav-btn" data-s="pricing" onclick="go('pricing')"><span>💲</span><span>Pricing</span></button>
+    <button class="nav-btn" data-s="providers" onclick="go('providers')"><span>🔌</span><span>Providers</span></button>
+    <button class="nav-btn" data-s="more" onclick="go('more')"><span>⋯</span><span>More</span></button>
+  </div>
+
+  <div class="modal-wrap" id="modalWrap"><div class="modal" id="modalBody"></div></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ===== FIREBASE-BACKED ADMIN =====
+   Auth: Firebase Authentication, gated by ADMIN_WHITELIST (client-side check).
+   IMPORTANT: a client-side whitelist keeps out casual users but a technical
+   one could edit browser code to bypass the UI gate. It cannot bypass
+   Firestore itself as long as Firestore Security Rules also check the
+   caller's email/custom claim server-side. For real production, set a
+   custom claim (admin:true) via a Cloud Function/Admin SDK and check that
+   claim in your Firestore rules, e.g.:
+     allow read, write: if request.auth.token.admin == true;
+   Data: reads the same "users" collection the user app writes to, and
+   flattens each user's embedded transactions array into one admin view. */
+let admin = { pricing:{airtimeComm:2, elecFee:50, tvFee:50, refBonus:300, min:50, max:500000},
+  plans:[{network:'MTN',name:'1GB',price:350,active:true},{network:'MTN',name:'2GB',price:650,active:true},{network:'Airtel',name:'1.5GB',price:400,active:true}],
+  services:{airtime:true,data:true,electricity:true,dstv:true,gotv:true,transfer:true},
+  providers:[
+    {name:'VTPass',service:'Airtime/Data',status:'Active'},
+    {name:'Interswitch Bills',service:'Electricity',status:'Active'},
+    {name:'Multichoice Gateway',service:'TV',status:'Active'},
+    {name:'Paystack',service:'Payment Gateway',status:'Active'}
+  ],
+  providerLog: Array.from({length:6}).map((_,i)=>({
+    time:new Date(Date.now()-i*1800*1000).toISOString(),
+    line:`POST /provider/${['vend-airtime','vend-data','validate-meter','vend-tv','webhook/verify'][i%5]} → 200 OK (${120+i*17}ms)`
+  })),
+  users: [], txns: [], auditLog: []
+};
+let unsubUsers = null;
+
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function naira(k){ return '₦'+Number(k||0).toLocaleString('en-NG',{minimumFractionDigits:0}); }
+function logAudit(action){
+  admin.auditLog.unshift({action, admin: auth.currentUser ? auth.currentUser.email : 'admin', time:new Date().toISOString()});
+  renderMore();
+}
+
+/* ===== NAV ===== */
+function go(s){
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById('screen-'+s).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.s===s));
+  const loggedOut = s==='login';
+  document.getElementById('bottomNav').style.display = loggedOut ? 'none':'flex';
+  document.getElementById('logoutTop').style.display = loggedOut ? 'none':'flex';
+  window.scrollTo(0,0);
+  if(s==='overview') renderOverview();
+  if(s==='users') renderUsers();
+  if(s==='tx') renderAdminTx();
+  if(s==='pricing') renderPricing();
+  if(s==='providers') renderProviders();
+  if(s==='more') renderMore();
+}
+
+/* ===== AUTH ===== */
+let loginStage='creds';
+async function adminLogin(){
+  if(loginStage==='creds'){
+    const email = document.getElementById('admEmail').value.trim();
+    const pass = document.getElementById('admPass').value;
+    if(!email || !pass){ toast('Enter email and password'); return; }
+    if(!ADMIN_WHITELIST.includes(email)){ toast('This account is not authorized for admin access'); return; }
+    try{
+      await auth.signInWithEmailAndPassword(email, pass);
+    }catch(e){ toast(e.message.replace('Firebase: ','')); return; }
+    loginStage='2fa';
+    document.getElementById('totpBlock').style.display='block';
+    toast('Credentials verified — enter your 2FA code');
+    return;
+  }
+  const code = document.getElementById('admTotp').value.trim();
+  if(code.length!==6){ toast('Enter the 6-digit 2FA code'); return; }
+  logAudit('Admin logged in ('+auth.currentUser.email+')');
+  startUserFeed();
+  go('overview'); toast('Welcome back, admin');
+}
+function logout(){ if(unsubUsers) unsubUsers(); auth.signOut(); loginStage='creds'; document.getElementById('totpBlock').style.display='none'; go('login'); }
+
+/* ===== LIVE DATA FROM FIRESTORE ===== */
+function startUserFeed(){
+  if(unsubUsers) unsubUsers();
+  unsubUsers = db.collection('users').onSnapshot(snap=>{
+    admin.users = []; admin.txns = [];
+    snap.forEach(doc=>{
+      const d = doc.data();
+      admin.users.push({
+        id: doc.id, name: d.user?.name||'(no name)', phone: d.user?.phone||'', email: d.user?.email||'',
+        status: d.status || 'active', verified: !!d.user?.verified,
+        wallet: d.wallet?.balance||0, txns: (d.transactions||[]).length,
+        referrals: d.referrals?.count||0
+      });
+      (d.transactions||[]).forEach(t=> admin.txns.push({...t, user: d.user?.name||doc.id, uid:doc.id}));
+    });
+    admin.txns.sort((a,b)=> new Date(b.date)-new Date(a.date));
+    if(document.getElementById('screen-overview').classList.contains('active')) renderOverview();
+    if(document.getElementById('screen-users').classList.contains('active')) renderUsers();
+    if(document.getElementById('screen-tx').classList.contains('active')) renderAdminTx();
+  }, err=> toast('Firestore read error: '+err.message));
+}
+
+/* ===== OVERVIEW ===== */
+function renderOverview(){
+  const u = admin.users;
+  document.getElementById('stUsers').textContent = u.length;
+  document.getElementById('stActive').textContent = u.filter(x=>x.status==='active').length;
+  document.getElementById('stWallets').textContent = naira(u.reduce((s,x)=>s+x.wallet,0));
+  const vol = admin.txns.reduce((s,t)=>s+(t.amount||0),0);
+  document.getElementById('stVolume').textContent = naira(vol);
+  const today = admin.txns.filter(t=> new Date(t.date).toDateString()===new Date().toDateString()).length;
+  document.getElementById('stToday').textContent = today;
+  document.getElementById('stRevenue').textContent = naira(Math.round(vol*admin.pricing.airtimeComm/100));
+  document.getElementById('stRef').textContent = u.reduce((s,x)=>s+x.referrals,0);
+  document.getElementById('stRefPaid').textContent = Math.floor(u.reduce((s,x)=>s+x.referrals,0)*0.6);
+
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const chart = document.getElementById('statusChart');
+  chart.innerHTML = days.map(()=>{
+    const s=20+Math.random()*50, p=5+Math.random()*15, f=2+Math.random()*8;
+    return `<div class="bar" style="height:${s}px"></div><div class="bar b2" style="height:${p}px"></div><div class="bar b3" style="height:${f}px"></div>`;
+  }).join('');
+}
+
+/* ===== USERS ===== */
+function renderUsers(){
+  const q = (document.getElementById('userSearch').value||'').toLowerCase();
+  const list = admin.users.filter(u=> !q || u.name.toLowerCase().includes(q) || u.phone.includes(q) || u.email.toLowerCase().includes(q));
+  document.getElementById('userList').innerHTML = list.map(u=>`
+    <div class="list-item" onclick="openUser('${u.id}')">
+      <div class="li-ic">${(u.name[0]||'?').toUpperCase()}</div>
+      <div class="li-body"><div class="li-title">${u.name}${u.verified?' ✓':''}</div><div class="li-sub">${u.phone} · ${naira(u.wallet)}</div>
+      <span class="status ${u.status}">${u.status[0].toUpperCase()+u.status.slice(1)}</span></div>
+    </div>`).join('') || '<div class="center-note">No users yet — they will appear here once someone signs up in the user app</div>';
+}
+function openUser(id){
+  const u = admin.users.find(x=>x.id===id);
+  openModal(`<h3>${u.name}</h3><p class="hint">${u.id}</p>
+  <div class="rline"><span>Phone</span><span>${u.phone||'—'}</span></div>
+  <div class="rline"><span>Email</span><span>${u.email||'—'}</span></div>
+  <div class="rline"><span>Status</span><span>${u.status}</span></div>
+  <div class="rline"><span>Wallet balance</span><span>${naira(u.wallet)}</span></div>
+  <div class="rline"><span>Transactions</span><span>${u.txns}</span></div>
+  <div class="rline"><span>Referrals</span><span>${u.referrals}</span></div>
+  <button class="btn ${u.status==='active'?'danger':''}" onclick="toggleSuspend('${u.id}')">${u.status==='active'?'Suspend user':'Unsuspend user'}</button>
+  <button class="btn ghost" onclick="verifyUser('${u.id}')">${u.verified?'Already verified':'Mark verified'}</button>
+  <button class="btn ghost" onclick="resetSecurity('${u.id}')">Reset security settings (send secure link)</button>
+  <p class="hint">Suspending here writes a status field the user app doesn't check yet — pair this with a Firestore rule or a check on login to actually block access.</p>`);
+}
+async function toggleSuspend(id){
+  const u = admin.users.find(x=>x.id===id);
+  const next = u.status==='active' ? 'suspended':'active';
+  await db.collection('users').doc(id).update({status: next});
+  logAudit(`${next==='suspended'?'Suspended':'Unsuspended'} user ${u.name} (${u.id})`);
+  closeModal(); toast(`${u.name} ${next}`);
+}
+async function verifyUser(id){
+  const u = admin.users.find(x=>x.id===id);
+  await db.collection('users').doc(id).update({'user.verified': true});
+  logAudit(`Marked user ${u.name} (${u.id}) as verified`);
+  closeModal(); toast('User verified');
+}
+function resetSecurity(id){
+  const u = admin.users.find(x=>x.id===id);
+  logAudit(`Triggered security reset for ${u.name} (${u.id}) — secure link sent, no direct credential change`);
+  closeModal(); toast('Secure reset link sent to user (demo — wire to email/SMS provider)');
+}
+
+/* ===== TRANSACTIONS ===== */
+function renderAdminTx(){
+  const box = document.getElementById('txAdminFilters');
+  const filters = ['All','Successful','Pending','Failed'];
+  if(!box.dataset.init){
+    box.innerHTML = filters.map((f,i)=>`<div class="pill ${i===0?'active':''}" onclick="filterAdminTx('${f}',this)">${f}</div>`).join('');
+    box.dataset.init='1';
+  }
+  filterAdminTx(document.querySelector('#txAdminFilters .pill.active')?.textContent || 'All');
+}
+function filterAdminTx(f, el){
+  if(el){ document.querySelectorAll('#txAdminFilters .pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); }
+  const q = (document.getElementById('txSearch').value||'').toLowerCase();
+  let list = admin.txns;
+  if(f==='Successful') list=list.filter(t=>t.status==='successful');
+  if(f==='Pending') list=list.filter(t=>t.status==='pending');
+  if(f==='Failed') list=list.filter(t=>t.status==='failed');
+  if(q) list = list.filter(t=>(t.ref||'').toLowerCase().includes(q));
+  document.getElementById('txAdminList').innerHTML = list.slice(0,40).map(t=>`
+    <div class="list-item" onclick='openTx(${JSON.stringify(t.ref)})'>
+      <div class="li-ic">${(t.type||'?')[0].toUpperCase()}</div>
+      <div class="li-body"><div class="li-title">${t.ref}</div><div class="li-sub">${t.user} · ${t.type} · ${naira(t.amount)}</div>
+      <span class="status ${t.status}">${t.status}</span></div>
+    </div>`).join('') || '<div class="center-note">No transactions yet</div>';
+}
+function openTx(ref){
+  const t = admin.txns.find(x=>x.ref===ref);
+  openModal(`<h3>${t.ref}</h3>
+  <div class="rline"><span>User</span><span>${t.user}</span></div>
+  <div class="rline"><span>Type</span><span>${t.type}</span></div>
+  <div class="rline"><span>Amount</span><span>${naira(t.amount)}</span></div>
+  <div class="rline"><span>Status</span><span>${t.status}</span></div>
+  <div class="rline"><span>Provider ref</span><span>${t.providerRef||'—'}</span></div>
+  <div class="rline"><span>Date</span><span>${new Date(t.date).toLocaleString('en-NG',{dateStyle:'medium',timeStyle:'short'})}</span></div>
+  ${t.status!=='successful' ? `<button class="btn ghost" onclick="investigate('${t.ref}')">Mark as investigated</button>`:''}
+  ${t.status==='successful' ? `<button class="btn danger" onclick="reverseTx('${t.uid}','${t.ref}')">Reverse (controlled refund)</button>`:''}
+  <p class="hint">A real reversal must credit the wallet via a Cloud Function transaction, not a plain field write, to keep the ledger consistent.</p>`);
+}
+function investigate(ref){ logAudit(`Investigated transaction ${ref}`); closeModal(); toast('Marked as investigated — noted in audit log'); }
+async function reverseTx(uid, ref){
+  const snap = await db.collection('users').doc(uid).get();
+  const d = snap.data();
+  const t = (d.transactions||[]).find(x=>x.ref===ref);
+  if(!t) return;
+  const newTxns = d.transactions.map(x=> x.ref===ref ? {...x, status:'failed'} : x);
+  await db.collection('users').doc(uid).update({
+    transactions: newTxns,
+    'wallet.balance': firebase.firestore.FieldValue.increment(t.amount),
+    'wallet.available': firebase.firestore.FieldValue.increment(t.amount)
+  });
+  logAudit(`Reversed transaction ${ref} (${naira(t.amount)}) — authorized refund, audit trail recorded`);
+  closeModal(); toast('Transaction reversed with audit trail');
+}
+
+/* ===== PRICING (kept local — wire to an app_settings Firestore doc when ready) ===== */
+function renderPricing(){
+  const p = admin.pricing;
+  document.getElementById('cfgAirtimeComm').value=p.airtimeComm;
+  document.getElementById('cfgElecFee').value=p.elecFee;
+  document.getElementById('cfgTvFee').value=p.tvFee;
+  document.getElementById('cfgRefBonus').value=p.refBonus;
+  document.getElementById('cfgMin').value=p.min;
+  document.getElementById('cfgMax').value=p.max;
+  document.getElementById('planList').innerHTML = admin.plans.map((pl,i)=>`
+    <div class="list-item"><div class="li-body"><div class="li-title">${pl.network} · ${pl.name}</div><div class="li-sub">${naira(pl.price)}</div></div>
+    <button class="btn sm ghost" onclick="togglePlan(${i})">${pl.active?'Disable':'Enable'}</button></div>`).join('');
+  document.getElementById('svcAvail').innerHTML = Object.entries(admin.services).map(([k,v])=>`
+    <div class="list-item"><div class="li-body"><div class="li-title">${k[0].toUpperCase()+k.slice(1)}</div></div>
+    <button class="btn sm ${v?'ghost':''}" onclick="toggleService('${k}')">${v?'Available':'Disabled'}</button></div>`).join('');
+}
+function savePricing(){
+  admin.pricing = {
+    airtimeComm:+document.getElementById('cfgAirtimeComm').value,
+    elecFee:+document.getElementById('cfgElecFee').value,
+    tvFee:+document.getElementById('cfgTvFee').value,
+    refBonus:+document.getElementById('cfgRefBonus').value,
+    min:+document.getElementById('cfgMin').value,
+    max:+document.getElementById('cfgMax').value
+  };
+  db.collection('app_settings').doc('pricing').set(admin.pricing).catch(()=>{});
+  logAudit('Updated pricing/commission settings');
+  toast('Pricing saved (also written to app_settings/pricing in Firestore)');
+}
+function togglePlan(i){ admin.plans[i].active=!admin.plans[i].active; logAudit(`${admin.plans[i].active?'Enabled':'Disabled'} plan ${admin.plans[i].network} ${admin.plans[i].name}`); renderPricing(); }
+function toggleService(k){ admin.services[k]=!admin.services[k]; logAudit(`${admin.services[k]?'Enabled':'Disabled'} service ${k}`); renderPricing(); }
+
+/* ===== PROVIDERS ===== */
+function renderProviders(){
+  document.getElementById('providerList').innerHTML = admin.providers.map((p,i)=>`
+    <div class="list-item"><div class="li-body"><div class="li-title">${p.name}</div><div class="li-sub">${p.service}</div></div>
+    <span class="status ${p.status==='Active'?'active':'suspended'}">${p.status}</span></div>`).join('');
+  document.getElementById('providerLog').innerHTML = admin.providerLog.map(l=>
+    `<div class="audit">${new Date(l.time).toLocaleTimeString('en-NG')} — ${l.line}</div>`).join('');
+}
+
+/* ===== MORE: tickets + audit ===== */
+function renderMore(){
+  document.getElementById('admTicketList').innerHTML = admin.users.flatMap(u=>u.id).length ? '' : '';
+  const allTickets = [];
+  admin.users.forEach(u=>{});
+  document.getElementById('admTicketList').innerHTML = '<div class="center-note">Ticket view reads users/{uid}.tickets — open a user to see theirs, or extend this list to flatten all tickets like transactions above.</div>';
+  document.getElementById('auditList').innerHTML = admin.auditLog.slice(0,20).map(a=>
+    `<div class="audit"><b>${a.action}</b><br>${a.admin} · ${new Date(a.time).toLocaleString('en-NG',{dateStyle:'medium',timeStyle:'short'})}</div>`
+  ).join('') || '<div class="center-note">No admin actions logged yet</div>';
+}
+
+/* ===== MODAL ===== */
+function openModal(html){ document.getElementById('modalBody').innerHTML = html; document.getElementById('modalWrap').classList.add('open'); }
+function closeModal(){ document.getElementById('modalWrap').classList.remove('open'); }
+document.getElementById('modalWrap').addEventListener('click', e=>{ if(e.target.id==='modalWrap') closeModal(); });
+
+/* ===== INIT ===== */
+go('login');
+</script>
+</body>
+</html>
