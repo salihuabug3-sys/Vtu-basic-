@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NairaFlex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#0B8A5D; --green-dark:#086b47; --green-light:#E6F5EE;
+  --navy:#0C1B17; --ink:#12211D; --sub:#5C6B66;
+  --card:#FFFFFF; --bg:#F4F8F6; --line:#E4ECE8;
+  --amber:#B77A1D; --amber-bg:#FCF1DE; --red:#C23B3B; --red-bg:#FBEAEA;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --card:#16221D; --bg:#0C1310; --ink:#EAF3EF; --sub:#9CB0A9; --line:#233029; --green-light:#12291F; --amber-bg:#2A2013; --red-bg:#2B1717;
+  }
+}
+:root[data-theme="dark"]{
+  --card:#16221D; --bg:#0C1310; --ink:#EAF3EF; --sub:#9CB0A9; --line:#233029; --green-light:#12291F; --amber-bg:#2A2013; --red-bg:#2B1717;
+}
+html,body{height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.num{font-family:Manrope,Inter,sans-serif}
+#app{max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;position:relative}
+.screen{display:none;padding:16px 16px 96px;animation:fade .18s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* Top bar */
+.topbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 8px;display:flex;align-items:center;justify-content:space-between;max-width:480px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px}
+.brand .mark{width:30px;height:30px;border-radius:9px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer}
+.dot{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--red)}
+
+/* Wallet hero */
+.wallet-card{background:linear-gradient(135deg,var(--green-dark),var(--green));border-radius:20px;padding:22px;color:#fff;margin-top:6px}
+.wallet-card .lbl{font-size:12.5px;opacity:.85}
+.wallet-card .bal{font-size:34px;font-weight:800;margin:6px 0 2px;letter-spacing:-.5px}
+.wallet-card .avail{font-size:12.5px;opacity:.85;margin-bottom:16px}
+.eye{background:none;border:none;color:#fff;opacity:.85;cursor:pointer;padding:0;margin-left:6px;vertical-align:middle}
+.fund-btn{background:#fff;color:var(--green-dark);border:none;border-radius:11px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer}
+
+/* Quick actions */
+.section-title{font-size:14px;font-weight:700;margin:20px 2px 10px;color:var(--sub)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer}
+.qa .ic{width:34px;height:34px;border-radius:10px;background:var(--green-light);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:15px;font-weight:700}
+.qa span{font-size:11px;color:var(--ink);font-weight:600;display:block;line-height:1.2}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.row{display:flex;align-items:center;justify-content:space-between}
+.list-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:none}
+.li-ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.li-body{flex:1;min-width:0}
+.li-title{font-weight:600;font-size:14px}
+.li-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.li-amt{font-weight:700;font-size:14px;white-space:nowrap}
+.status{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:3px}
+.status.success{background:var(--green-light);color:var(--green-dark)}
+.status.pending{background:var(--amber-bg);color:var(--amber)}
+.status.failed{background:var(--red-bg);color:var(--red)}
+
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;max-width:480px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+.nav-btn{flex:1;border:none;background:none;padding:10px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--sub);cursor:pointer;font-family:inherit}
+.nav-btn .ni{font-size:17px}
+.nav-btn span{font-size:10.5px;font-weight:600}
+.nav-btn.active{color:var(--green)}
+
+/* Forms */
+label{font-size:12.5px;font-weight:600;color:var(--sub);display:block;margin:14px 0 6px}
+input,select,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:14.5px;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--green);outline-offset:1px}
+.btn{width:100%;padding:14px;border-radius:13px;border:none;background:var(--green);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:18px}
+.btn:disabled{opacity:.5}
+.btn.secondary{background:var(--green-light);color:var(--green-dark)}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink)}
+.net-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+.net{border:2px solid var(--line);border-radius:13px;padding:10px 4px;text-align:center;cursor:pointer;font-size:12px;font-weight:700}
+.net.sel{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
+.plan{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.plan.sel{border-color:var(--green);background:var(--green-light)}
+.plan .pn{font-weight:700;font-size:13.5px}
+.plan .pv{font-size:11.5px;color:var(--sub)}
+.plan .pp{font-weight:700;color:var(--green-dark);font-size:14px}
+.pill-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-top:6px}
+.pill{border:1px solid var(--line);border-radius:20px;padding:7px 13px;font-size:12.5px;font-weight:600;white-space:nowrap;cursor:pointer;background:var(--card)}
+.pill.active{background:var(--green);color:#fff;border-color:var(--green)}
+.hint{font-size:11.5px;color:var(--sub);margin-top:6px}
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.back-row .icon-btn{width:34px;height:34px}
+.back-row h2{font-size:18px;margin:0}
+.center-note{text-align:center;color:var(--sub);font-size:13px;padding:40px 10px}
+
+/* Modal */
+.modal-wrap{position:fixed;inset:0;background:rgba(6,14,11,.55);display:none;align-items:flex-end;z-index:50;max-width:480px;margin:0 auto}
+.modal-wrap.open{display:flex}
+.modal{background:var(--card);width:100%;border-radius:20px 20px 0 0;padding:20px;max-height:88vh;overflow-y:auto}
+.modal h3{margin:0 0 4px;font-size:17px}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin:22px 0}
+.pin-dots .d{width:14px;height:14px;border-radius:50%;border:2px solid var(--line)}
+.pin-dots .d.filled{background:var(--green);border-color:var(--green)}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.keypad button{padding:16px 0;border-radius:13px;border:1px solid var(--line);background:var(--bg);font-size:18px;font-weight:700;color:var(--ink)}
+
+.receipt{text-align:center;padding:6px 0}
+.receipt .ok{width:56px;height:56px;border-radius:50%;background:var(--green-light);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px}
+.receipt.pending .ok{background:var(--amber-bg);color:var(--amber)}
+.receipt.failed .ok{background:var(--red-bg);color:var(--red)}
+.receipt .amt{font-size:26px;font-weight:800}
+.rline{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.rline span:first-child{color:var(--sub)}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:30px;font-size:13px;z-index:60;opacity:0;transition:opacity .25s;max-width:400px;text-align:center}
+.toast.show{opacity:1}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.1/firebase-app-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.1/firebase-auth-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.1/firebase-firestore-compat.min.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwblka7oXdT2FiGIEmCjUQsrMn7Bi4G5Y",
+    authDomain: "naira-flex.firebaseapp.com",
+    projectId: "naira-flex",
+    storageBucket: "naira-flex.firebasestorage.app",
+    messagingSenderId: "452032382396",
+    appId: "1:452032382396:web:8beb5b05db5248fa63d7b9"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+</script>
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar" id="topbar">
+    <div class="brand"><div class="mark">₦</div>NairaFlex</div>
+    <div style="display:flex;gap:8px">
+      <button class="icon-btn" onclick="go('notifications')">🔔<span class="dot" id="notifDot"></span></button>
+      <button class="icon-btn" onclick="go('profile')">👤</button>
+    </div>
+  </div>
+
+  <!-- ===== AUTH ===== -->
+  <div class="screen" id="screen-auth">
+    <div style="text-align:center;margin:50px 0 30px">
+      <div class="mark" style="width:56px;height:56px;border-radius:16px;font-size:26px;margin:0 auto 14px">₦</div>
+      <h1 style="margin:0;font-size:22px">NairaFlex</h1>
+      <p style="color:var(--sub);font-size:13px;margin-top:4px">Flex Your Payments</p>
+    </div>
+    <div class="card">
+      <div id="authFields">
+        <div id="signupOnly" style="display:none">
+          <label>Full name</label>
+          <input id="authName" placeholder="Ada Okafor">
+          <label>Phone number</label>
+          <input id="authPhone" placeholder="080xxxxxxxx" inputmode="tel">
+        </div>
+        <label>Email</label>
+        <input id="authEmail" type="email" placeholder="you@email.com">
+        <label>Password</label>
+        <input id="authPass" type="password" placeholder="•••••••• (min 6 characters)">
+      </div>
+      <button class="btn" onclick="doAuth()">Log in</button>
+      <button class="btn ghost" onclick="toggleAuthMode()" id="authToggleBtn" style="margin-top:10px">Create an account</button>
+      <p class="hint" style="text-align:center;margin-top:12px">Demo mode — any details work. No real money moves.</p>
+    </div>
+  </div>
+
+  <!-- ===== HOME ===== -->
+  <div class="screen" id="screen-home">
+    <div class="wallet-card">
+      <div class="lbl">Wallet balance <button class="eye" onclick="toggleBal()">👁</button></div>
+      <div class="bal" id="balDisplay">₦0.00</div>
+      <div class="avail" id="availDisplay">Available: ₦0.00</div>
+      <button class="fund-btn" onclick="openFund()">+ Fund Wallet</button>
+    </div>
+
+    <div class="section-title">Services</div>
+    <div class="grid4">
+      <div class="qa" onclick="openAirtime()"><div class="ic">📱</div><span>Airtime</span></div>
+      <div class="qa" onclick="openData()"><div class="ic">📶</div><span>Data</span></div>
+      <div class="qa" onclick="openElectricity()"><div class="ic">💡</div><span>Electricity</span></div>
+      <div class="qa" onclick="openTv('DSTV')"><div class="ic">📺</div><span>DSTV</span></div>
+      <div class="qa" onclick="openTv('GOtv')"><div class="ic">📺</div><span>GOtv</span></div>
+      <div class="qa" onclick="openTransfer()"><div class="ic">↗️</div><span>Transfer</span></div>
+      <div class="qa" onclick="go('rewards')"><div class="ic">🎁</div><span>Rewards</span></div>
+      <div class="qa" onclick="go('support')"><div class="ic">💬</div><span>Support</span></div>
+    </div>
+
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Recent activity</span>
+      <span style="color:var(--green);font-weight:700;font-size:12.5px;cursor:pointer" onclick="go('transactions')">See all</span>
+    </div>
+    <div class="card" id="homeRecent"></div>
+  </div>
+
+  <!-- ===== SERVICES ===== -->
+  <div class="screen" id="screen-services">
+    <h2 style="font-size:19px;margin:8px 2px 14px">Services</h2>
+    <div class="grid4">
+      <div class="qa" onclick="openAirtime()"><div class="ic">📱</div><span>Airtime</span></div>
+      <div class="qa" onclick="openData()"><div class="ic">📶</div><span>Data</span></div>
+      <div class="qa" onclick="openElectricity()"><div class="ic">💡</div><span>Electricity</span></div>
+      <div class="qa" onclick="openTv('DSTV')"><div class="ic">📺</div><span>DSTV</span></div>
+      <div class="qa" onclick="openTv('GOtv')"><div class="ic">📺</div><span>GOtv</span></div>
+      <div class="qa" onclick="openTransfer()"><div class="ic">↗️</div><span>Transfer</span></div>
+      <div class="qa" onclick="openFund()"><div class="ic">➕</div><span>Fund Wallet</span></div>
+      <div class="qa" onclick="go('support')"><div class="ic">💬</div><span>Support</span></div>
+    </div>
+  </div>
+
+  <!-- ===== TRANSACTIONS ===== -->
+  <div class="screen" id="screen-transactions">
+    <h2 style="font-size:19px;margin:8px 2px 12px">Transactions</h2>
+    <div class="pill-row" id="txFilters"></div>
+    <div class="card" id="txList" style="margin-top:12px"></div>
+  </div>
+
+  <!-- ===== REWARDS ===== -->
+  <div class="screen" id="screen-rewards">
+    <h2 style="font-size:19px;margin:8px 2px 14px">Referral & Rewards</h2>
+    <div class="wallet-card" style="background:linear-gradient(135deg,var(--navy),#1c3129)">
+      <div class="lbl">Your referral code</div>
+      <div class="bal" style="font-size:24px" id="refCode">-</div>
+      <button class="fund-btn" onclick="copyRef()">Copy link</button>
+    </div>
+    <div class="grid4" style="grid-template-columns:1fr 1fr;margin-top:14px">
+      <div class="card"><div class="hint">Referrals</div><div class="num" style="font-size:22px;font-weight:800" id="refCount">0</div></div>
+      <div class="card"><div class="hint">Earnings</div><div class="num" style="font-size:22px;font-weight:800" id="refEarn">₦0</div></div>
+    </div>
+    <div class="section-title">How it works</div>
+    <div class="card" style="font-size:13px;color:var(--sub);line-height:1.6">
+      Share your code → your friend signs up and completes one funded transaction → ₦300 bonus is credited to you automatically once that transaction is verified. Unverified or reversed transactions never trigger a bonus.
+    </div>
+    <div class="section-title">Referral history</div>
+    <div class="card" id="refHistory"></div>
+  </div>
+
+  <!-- ===== PROFILE ===== -->
+  <div class="screen" id="screen-profile">
+    <h2 style="font-size:19px;margin:8px 2px 14px">Profile</h2>
+    <div class="card row">
+      <div>
+        <div style="font-weight:700" id="profName">-</div>
+        <div class="hint" id="profPhone">-</div>
+        <div class="status success" id="profVerified">Verified</div>
+      </div>
+      <div class="mark" style="width:46px;height:46px;border-radius:14px;font-size:18px">👤</div>
+    </div>
+    <div class="section-title">Security</div>
+    <div class="card" style="padding:4px 14px">
+      <div class="list-item" onclick="alert('Change password flow — sends OTP, then sets new password.')" style="cursor:pointer">Change password ›</div>
+      <div class="list-item" onclick="openChangePin()" style="cursor:pointer">Change transaction PIN ›</div>
+      <div class="list-item" onclick="alert('Biometric login enabled where device supports it.')" style="cursor:pointer">Biometric login ›</div>
+    </div>
+    <div class="section-title">App</div>
+    <div class="card" style="padding:4px 14px">
+      <div class="list-item" onclick="go('notifications')" style="cursor:pointer">Notification settings ›</div>
+      <div class="list-item" onclick="go('support')" style="cursor:pointer">Customer support ›</div>
+      <div class="list-item" onclick="toggleTheme()" style="cursor:pointer">Toggle dark / light ›</div>
+    </div>
+    <button class="btn ghost" style="margin-top:16px" onclick="logout()">Log out</button>
+  </div>
+
+  <!-- ===== NOTIFICATIONS ===== -->
+  <div class="screen" id="screen-notifications">
+    <div class="back-row"><button class="icon-btn" onclick="go('home')">←</button><h2>Notifications</h2></div>
+    <div class="card" id="notifList"></div>
+  </div>
+
+  <!-- ===== SUPPORT ===== -->
+  <div class="screen" id="screen-support">
+    <div class="back-row"><button class="icon-btn" onclick="go('home')">←</button><h2>Support</h2></div>
+    <div class="section-title" style="margin-top:0">FAQ</div>
+    <div class="card">
+      <div class="list-item"><div><b style="font-size:13px">How long does data purchase take?</b><div class="hint">Usually under 2 minutes; you'll get a notification either way.</div></div></div>
+      <div class="list-item"><div><b style="font-size:13px">Is my wallet safe?</b><div class="hint">Every movement is recorded in an immutable ledger and protected by your transaction PIN.</div></div></div>
+      <div class="list-item"><div><b style="font-size:13px">My transaction is pending — what now?</b><div class="hint">Pending transactions are auto-reconciled with the provider; open a ticket if it's pending over 30 minutes.</div></div></div>
+    </div>
+    <div class="section-title">Raise a ticket</div>
+    <div class="card">
+      <label>Subject</label><input id="ticketSubject" placeholder="e.g. Data purchase not delivered">
+      <label>Message</label><textarea id="ticketMsg" rows="3" placeholder="Describe the issue"></textarea>
+      <button class="btn" onclick="submitTicket()">Submit ticket</button>
+    </div>
+    <div class="section-title">Your tickets</div>
+    <div class="card" id="ticketList"></div>
+  </div>
+
+  <div class="bottom-nav" id="bottomNav">
+    <button class="nav-btn" data-s="home" onclick="go('home')"><span class="ni">🏠</span><span>Home</span></button>
+    <button class="nav-btn" data-s="services" onclick="go('services')"><span class="ni">🧾</span><span>Services</span></button>
+    <button class="nav-btn" data-s="transactions" onclick="go('transactions')"><span class="ni">📄</span><span>Transactions</span></button>
+    <button class="nav-btn" data-s="rewards" onclick="go('rewards')"><span class="ni">🎁</span><span>Rewards</span></button>
+    <button class="nav-btn" data-s="profile" onclick="go('profile')"><span class="ni">👤</span><span>Profile</span></button>
+  </div>
+
+  <!-- Generic bottom-sheet modal, content injected per flow -->
+  <div class="modal-wrap" id="modalWrap"><div class="modal" id="modalBody"></div></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ============ FIREBASE-BACKED STATE ============
+   Auth: Firebase Authentication (email/password).
+   Data: Firestore doc users/{uid} holding wallet, ledger, transactions,
+   notifications, referrals, tickets — synced live via onSnapshot.
+   NOTE: wallet math still runs client-side for this prototype. For real
+   money, move debit/credit + provider calls into a Cloud Function so the
+   client can never write balance directly (Firestore rules alone can't
+   express "only decrease via a valid transaction"). */
+let state = defaultState();
+let uid = null;
+let unsub = null;
+
+function defaultState(){
+  return {
+    balHidden:false, pin:null,
+    user:{name:'', phone:'', email:'', verified:false, referralCode:''},
+    wallet:{balance:0, available:0},
+    ledger:[], transactions:[], notifications:[], tickets:[],
+    referrals:{count:0, earnings:0, history:[]}
+  };
+}
+function docRef(){ return db.collection('users').doc(uid); }
+async function save(patch){
+  try{ await docRef().set(patch || state, {merge:true}); }
+  catch(e){ toast('Sync error: '+e.message); }
+}
+
+const NETWORKS = ['MTN','Airtel','Glo','9mobile'];
+const DATA_PLANS = {
+  MTN:[{name:'1GB',validity:'30 days',price:350},{name:'2GB',validity:'30 days',price:650},{name:'5GB',validity:'30 days',price:1500}],
+  Airtel:[{name:'1.5GB',validity:'30 days',price:400},{name:'3GB',validity:'30 days',price:800},{name:'6GB',validity:'30 days',price:1800}],
+  Glo:[{name:'1GB',validity:'30 days',price:300},{name:'2.5GB',validity:'30 days',price:700},{name:'5.8GB',validity:'30 days',price:1500}],
+  '9mobile':[{name:'1GB',validity:'30 days',price:350},{name:'2GB',validity:'30 days',price:600},{name:'4.5GB',validity:'30 days',price:1400}]
+};
+const DISCOS = ['Ikeja Electric','Eko Electric','Abuja DisCo','Ibadan DisCo','Kano DisCo'];
+const TV_PACKAGES = {
+  DSTV:[{name:'Padi',price:4400},{name:'Yanga',price:6000},{name:'Compact',price:19000}],
+  GOtv:[{name:'Smallie',price:1900},{name:'Jinja',price:3900},{name:'Max',price:8500}]
+};
+
+function ref(){ return 'NFX'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase(); }
+function naira(k){ return '₦'+Number(k).toLocaleString('en-NG',{minimumFractionDigits:2}); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+
+/* ---- Transaction engine: Firestore transaction for the debit/credit,
+   then array updates for records (see NOTE above on Cloud Functions). ---- */
+async function runTransaction({type, amount, meta}){
+  if(amount>0 && state.wallet.available < amount){ toast('Insufficient wallet balance'); return null; }
+  const txRef = ref();
+  const txn = {ref:txRef, type, amount, meta, status:'pending', date:new Date().toISOString()};
+  try{
+    if(amount>0){
+      await db.runTransaction(async t=>{
+        const snap = await t.get(docRef());
+        const w = snap.data().wallet;
+        if(w.available < amount) throw new Error('insufficient');
+        t.update(docRef(), {
+          'wallet.available': w.available - amount,
+          'wallet.balance': w.balance - amount,
+          ledger: firebase.firestore.FieldValue.arrayUnion({txRef, kind:'debit', amount, date:txn.date})
+        });
+      });
+    }
+    await docRef().update({ transactions: firebase.firestore.FieldValue.arrayUnion(txn) });
+  }catch(e){ toast('Transaction could not start: insufficient balance'); return null; }
+
+  setTimeout(async ()=>{
+    const failed = Math.random() < 0.06;
+    const updated = {...txn, status: failed?'failed':'successful', providerRef: failed?null:'PRV'+Math.random().toString(36).slice(2,9).toUpperCase()};
+    // replace the pending record with the resolved one, reverse funds if failed
+    const fresh = (await docRef().get()).data();
+    const newTxns = fresh.transactions.map(t=> t.ref===txRef ? updated : t);
+    const patch = { transactions: newTxns };
+    if(failed && amount>0){
+      patch['wallet.available'] = fresh.wallet.available + amount;
+      patch['wallet.balance'] = fresh.wallet.balance + amount;
+      patch.ledger = firebase.firestore.FieldValue.arrayUnion({txRef, kind:'credit (reversal)', amount, date:new Date().toISOString()});
+    }
+    patch.notifications = firebase.firestore.FieldValue.arrayUnion({
+      title: failed?'Transaction failed':'Transaction successful',
+      body: `${labelFor(type)} of ${naira(amount)} ${failed?'failed — funds reversed to your wallet.':'was successful.'}`,
+      read:false, date:new Date().toISOString()
+    });
+    await docRef().update(patch);
+    if(currentModalRef===txRef) showReceipt(updated);
+  }, 1400);
+  return txn;
+}
+let currentModalRef=null;
+function labelFor(t){ return {airtime:'Airtime purchase',data:'Data purchase',electricity:'Electricity payment',tv:'TV subscription',transfer:'Transfer',funding:'Wallet funding'}[t]||t; }
+
+/* ============ NAV ============ */
+function go(s){
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  const el = document.getElementById('screen-'+s);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.s===s));
+  document.getElementById('topbar').style.display = s==='auth' ? 'none':'flex';
+  document.getElementById('bottomNav').style.display = s==='auth' ? 'none':'flex';
+  window.scrollTo(0,0);
+  if(s==='transactions') renderTx();
+  if(s==='notifications') renderNotif();
+  if(s==='rewards') renderRewards();
+  if(s==='support') renderTickets();
+}
+
+/* ============ AUTH ============ */
+let authMode='login';
+function toggleAuthMode(){
+  authMode = authMode==='login' ? 'signup':'login';
+  document.getElementById('signupOnly').style.display = authMode==='signup' ? 'block':'none';
+  document.querySelector('#screen-auth .btn:not(.ghost)').textContent = authMode==='login' ? 'Log in':'Create account';
+  document.getElementById('authToggleBtn').textContent = authMode==='login' ? 'Create an account':'I already have an account';
+}
+async function doAuth(){
+  const email = document.getElementById('authEmail').value.trim();
+  const pass = document.getElementById('authPass').value;
+  if(!email || pass.length<6){ toast('Enter a valid email and a 6+ character password'); return; }
+  try{
+    if(authMode==='signup'){
+      const name = document.getElementById('authName').value.trim() || 'NairaFlex User';
+      const phone = document.getElementById('authPhone').value.trim();
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      const fresh = defaultState();
+      fresh.user = {name, phone, email, verified:false, referralCode:'NF-'+Math.random().toString(36).slice(2,7).toUpperCase()};
+      await db.collection('users').doc(cred.user.uid).set(fresh);
+      toast('Account created — verification email sent (demo)');
+    } else {
+      await auth.signInWithEmailAndPassword(email, pass);
+    }
+  }catch(e){ toast(e.message.replace('Firebase: ','')); }
+}
+function logout(){ auth.signOut(); }
+
+auth.onAuthStateChanged(user=>{
+  if(unsub){ unsub(); unsub=null; }
+  if(user){
+    uid = user.uid;
+    unsub = docRef().onSnapshot(snap=>{
+      if(!snap.exists){ return; }
+      state = {...defaultState(), ...snap.data()};
+      renderAll();
+      if(!state.pin){ openSetPin(); }
+    });
+    go('home');
+  } else {
+    uid = null; state = defaultState();
+    go('auth');
+  }
+});
+
+/* ============ RENDER ============ */
+function toggleBal(){ save({balHidden: !state.balHidden}); }
+function renderAll(){
+  document.getElementById('balDisplay').textContent = state.balHidden ? '₦ • • • • •' : naira(state.wallet.balance);
+  document.getElementById('availDisplay').textContent = 'Available: '+(state.balHidden?'₦ • • • •':naira(state.wallet.available));
+  document.getElementById('profName').textContent = state.user.name;
+  document.getElementById('profPhone').textContent = state.user.phone || state.user.email;
+  document.getElementById('refCode').textContent = state.user.referralCode;
+  const unread = (state.notifications||[]).filter(n=>!n.read).length;
+  document.getElementById('notifDot').style.display = unread ? 'block':'none';
+  const recent = document.getElementById('homeRecent');
+  const sorted = [...(state.transactions||[])].sort((a,b)=> new Date(b.date)-new Date(a.date));
+  recent.innerHTML = sorted.slice(0,4).map(txItem).join('') || '<div class="center-note">No transactions yet — try Fund Wallet</div>';
+  if(document.getElementById('screen-transactions').classList.contains('active')) renderTx();
+  if(document.getElementById('screen-rewards').classList.contains('active')) renderRewards();
+  if(document.getElementById('screen-notifications').classList.contains('active')) renderNotif();
+  if(document.getElementById('screen-support').classList.contains('active')) renderTickets();
+}
+function txIcon(t){ return {airtime:'📱',data:'📶',electricity:'💡',tv:'📺',transfer:'↗️',funding:'➕'}[t]||'💳'; }
+function txItem(t){
+  return `<div class="list-item"><div class="li-ic" style="background:var(--green-light);color:var(--green-dark)">${txIcon(t.type)}</div>
+    <div class="li-body"><div class="li-title">${labelFor(t.type)}</div><div class="li-sub">${new Date(t.date).toLocaleString('en-NG',{dateStyle:'medium',timeStyle:'short'})} · ${t.ref}</div>
+    <span class="status ${t.status==='successful'?'success':t.status}">${t.status[0].toUpperCase()+t.status.slice(1)}</span></div>
+    <div class="li-amt">${t.type==='funding'?'+':'-'}${naira(t.amount)}</div></div>`;
+}
+function renderTx(){
+  const filters = ['All','Successful','Pending','Failed','Airtime','Data','Electricity','TV','Wallet funding','Transfers'];
+  const box = document.getElementById('txFilters');
+  if(!box.dataset.init){
+    box.innerHTML = filters.map((f,i)=>`<div class="pill ${i===0?'active':''}" onclick="filterTx('${f}',this)">${f}</div>`).join('');
+    box.dataset.init='1';
+  }
+  filterTx(document.querySelector('#txFilters .pill.active')?.textContent || 'All');
+}
+function filterTx(f, el){
+  if(el){ document.querySelectorAll('#txFilters .pill').forEach(p=>p.classList.remove('active')); el.classList.add('active'); }
+  const map = {Airtime:'airtime',Data:'data',Electricity:'electricity',TV:'tv','Wallet funding':'funding',Transfers:'transfer'};
+  let list = [...(state.transactions||[])].sort((a,b)=> new Date(b.date)-new Date(a.date));
+  if(f==='Successful') list = list.filter(t=>t.status==='successful');
+  else if(f==='Pending') list = list.filter(t=>t.status==='pending');
+  else if(f==='Failed') list = list.filter(t=>t.status==='failed');
+  else if(map[f]) list = list.filter(t=>t.type===map[f]);
+  document.getElementById('txList').innerHTML = list.map(txItem).join('') || '<div class="center-note">No transactions in this filter</div>';
+}
+function renderNotif(){
+  const list = [...(state.notifications||[])].sort((a,b)=> new Date(b.date)-new Date(a.date));
+  if(list.some(n=>!n.read)) docRef().update({notifications: list.map(n=>({...n, read:true}))});
+  document.getElementById('notifDot').style.display='none';
+  document.getElementById('notifList').innerHTML = list.map(n=>
+    `<div class="list-item"><div class="li-body"><div class="li-title">${n.title}</div><div class="li-sub">${n.body}</div><div class="hint">${new Date(n.date).toLocaleString('en-NG',{dateStyle:'medium',timeStyle:'short'})}</div></div></div>`
+  ).join('') || '<div class="center-note">No notifications yet</div>';
+}
+function renderRewards(){
+  document.getElementById('refCount').textContent = state.referrals.count;
+  document.getElementById('refEarn').textContent = naira(state.referrals.earnings);
+  document.getElementById('refHistory').innerHTML = (state.referrals.history||[]).map(r=>
+    `<div class="list-item"><div class="li-body"><div class="li-title">${r.name}</div><div class="li-sub">${r.status}</div></div><div class="li-amt">${r.status==='Bonus paid'?'+'+naira(300):'—'}</div></div>`
+  ).join('') || '<div class="center-note">No referrals yet — share your code above</div>';
+}
+function copyRef(){ toast('Referral link copied: nairaflex.app/r/'+state.user.referralCode); }
+function renderTickets(){
+  document.getElementById('ticketList').innerHTML = (state.tickets||[]).map(t=>
+    `<div class="list-item"><div class="li-body"><div class="li-title">${t.subject}</div><div class="li-sub">${t.msg}</div><span class="status ${t.status==='Open'?'pending':'success'}">${t.status}</span></div></div>`
+  ).join('') || '<div class="center-note">No tickets raised</div>';
+}
+function submitTicket(){
+  const subject = document.getElementById('ticketSubject').value.trim();
+  const msg = document.getElementById('ticketMsg').value.trim();
+  if(!subject||!msg){ toast('Fill in subject and message'); return; }
+  docRef().update({tickets: firebase.firestore.FieldValue.arrayUnion({subject,msg,status:'Open'})});
+  document.getElementById('ticketSubject').value=''; document.getElementById('ticketMsg').value='';
+  toast("Ticket submitted — we'll reply soon");
+}
+
+/* ============ MODAL HELPERS ============ */
+function openModal(html){ document.getElementById('modalBody').innerHTML = html; document.getElementById('modalWrap').classList.add('open'); }
+function closeModal(){ document.getElementById('modalWrap').classList.remove('open'); }
+document.getElementById('modalWrap').addEventListener('click', e=>{ if(e.target.id==='modalWrap') closeModal(); });
+
+/* ---- PIN entry ---- */
+let pinBuffer='', pinCallback=null, pinSetup=false;
+function pinPad(){
+  return `<div class="keypad">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>
+    k==='' ? '<div></div>' : `<button onclick="pinKey('${k}')">${k}</button>`).join('')}</div>`;
+}
+function pinKey(k){
+  if(k==='⌫'){ pinBuffer = pinBuffer.slice(0,-1); }
+  else if(pinBuffer.length<4){ pinBuffer += k; }
+  document.querySelectorAll('.pin-dots .d').forEach((d,i)=> d.classList.toggle('filled', i<pinBuffer.length));
+  if(pinBuffer.length===4){
+    setTimeout(()=>{
+      if(pinSetup){ finishPinSetup(); }
+      else if(pinBuffer===state.pin){ closeModal(); pinCallback && pinCallback(); }
+      else { toast('Incorrect PIN'); pinBuffer=''; document.querySelectorAll('.pin-dots .d').forEach(d=>d.classList.remove('filled')); }
+    },150);
+  }
+}
+function askPin(cb){
+  pinBuffer=''; pinSetup=false; pinCallback=cb;
+  openModal(`<h3>Enter transaction PIN</h3><p class="hint">Confirm this payment</p><div class="pin-dots">${'<div class="d"></div>'.repeat(4)}</div>${pinPad()}`);
+}
+function openSetPin(){
+  pinBuffer=''; pinSetup=true; window._newPinStage='first'; window._firstPin='';
+  openModal(`<h3>Set transaction PIN</h3><p class="hint">Choose a 4-digit PIN for payments</p><div class="pin-dots">${'<div class="d"></div>'.repeat(4)}</div>${pinPad()}`);
+}
+function openChangePin(){ openSetPin(); }
+function finishPinSetup(){
+  if(window._newPinStage==='first'){
+    window._firstPin = pinBuffer; window._newPinStage='confirm'; pinBuffer='';
+    document.querySelectorAll('.pin-dots .d').forEach(d=>d.classList.remove('filled'));
+    document.querySelector('.modal h3').textContent='Confirm your PIN';
+  } else {
+    if(pinBuffer===window._firstPin){
+      save({pin: pinBuffer}); closeModal(); toast('Transaction PIN set'); go('home');
+    } else { toast('PINs did not match — try again'); openSetPin(); }
+  }
+}
+
+/* ============ FUND WALLET ============ */
+function openFund(){
+  openModal(`<h3>Fund Wallet</h3><p class="hint">Simulated Paystack/Flutterwave checkout — verified server-side via webhook before crediting.</p>
+  <label>Amount (₦)</label><input id="fundAmt" type="number" placeholder="5000" inputmode="numeric">
+  <button class="btn" onclick="initiateFund()">Continue to payment</button>`);
+}
+function initiateFund(){
+  const amt = Number(document.getElementById('fundAmt').value);
+  if(!amt || amt<100){ toast('Enter a valid amount'); return; }
+  openModal(`<h3>Confirm payment</h3><div class="card" style="margin-top:6px"><div class="rline"><span>Amount</span><span>${naira(amt)}</span></div><div class="rline"><span>Method</span><span>Card •••• 4242 (demo)</span></div></div>
+  <button class="btn" onclick="completeFund(${amt})">Pay ${naira(amt)}</button>`);
+}
+async function completeFund(amt){
+  closeModal(); toast('Processing payment…');
+  setTimeout(async ()=>{
+    const txRef = ref();
+    await docRef().update({
+      'wallet.balance': firebase.firestore.FieldValue.increment(amt),
+      'wallet.available': firebase.firestore.FieldValue.increment(amt),
+      ledger: firebase.firestore.FieldValue.arrayUnion({txRef, kind:'credit', amount:amt, date:new Date().toISOString()}),
+      transactions: firebase.firestore.FieldValue.arrayUnion({ref:txRef, type:'funding', amount:amt, status:'successful', date:new Date().toISOString(), providerRef:'PSK'+Math.random().toString(36).slice(2,8).toUpperCase()}),
+      notifications: firebase.firestore.FieldValue.arrayUnion({title:'Wallet funded', body:`Wallet funding of ${naira(amt)} was successful.`, read:false, date:new Date().toISOString()})
+    });
+    toast('Wallet funded successfully');
+  }, 1200);
+}
+
+/* ============ AIRTIME ============ */
+let airtimeSel = {network:null};
+function openAirtime(){
+  airtimeSel = {network:null};
+  openModal(`<h3>Buy Airtime</h3><label>Select network</label>
+  <div class="net-grid">${NETWORKS.map(n=>`<div class="net" id="an-${n}" onclick="selAirtimeNet('${n}')">${n}</div>`).join('')}</div>
+  <label>Phone number</label><input id="airtimePhone" placeholder="080xxxxxxxx" inputmode="tel">
+  <label>Amount (₦)</label><input id="airtimeAmt" type="number" placeholder="500" inputmode="numeric">
+  <button class="btn" onclick="confirmAirtime()">Continue</button>`);
+}
+function selAirtimeNet(n){ airtimeSel.network=n; document.querySelectorAll('.net').forEach(e=>e.classList.remove('sel')); document.getElementById('an-'+n).classList.add('sel'); }
+function confirmAirtime(){
+  const phone = document.getElementById('airtimePhone').value.trim();
+  const amt = Number(document.getElementById('airtimeAmt').value);
+  if(!airtimeSel.network){ toast('Select a network'); return; }
+  if(!phone || phone.length<10){ toast('Invalid phone number'); return; }
+  if(!amt || amt<50){ toast('Enter a valid amount'); return; }
+  openModal(reviewHtml('Airtime',[['Network',airtimeSel.network],['Phone',phone],['Amount',naira(amt)]], ()=>{
+    askPin(async ()=>{
+      const txn = await runTransaction({type:'airtime', amount:amt, meta:{network:airtimeSel.network, phone}});
+      if(txn){ currentModalRef=txn.ref; showPendingThenReceipt(); }
+    });
+  }));
+}
+
+/* ============ DATA ============ */
+let dataSel = {network:null, plan:null};
+function openData(){ dataSel = {network:'MTN', plan:null}; renderDataModal(); }
+function renderDataModal(){
+  const plans = DATA_PLANS[dataSel.network];
+  openModal(`<h3>Buy Data</h3><label>Select network</label>
+  <div class="net-grid">${NETWORKS.map(n=>`<div class="net ${n===dataSel.network?'sel':''}" onclick="selDataNet('${n}')">${n}</div>`).join('')}</div>
+  <label>Available plans</label>
+  ${plans.map((p,i)=>`<div class="plan ${dataSel.plan===i?'sel':''}" onclick="selDataPlan(${i})"><div><div class="pn">${p.name}</div><div class="pv">${p.validity}</div></div><div class="pp">${naira(p.price)}</div></div>`).join('')}
+  <label>Recipient phone</label><input id="dataPhone" placeholder="080xxxxxxxx" inputmode="tel">
+  <button class="btn" onclick="confirmData()">Continue</button>`);
+}
+function selDataNet(n){ dataSel.network=n; dataSel.plan=null; renderDataModal(); }
+function selDataPlan(i){ dataSel.plan=i; renderDataModal(); document.getElementById('dataPhone').focus(); }
+function confirmData(){
+  const phone = document.getElementById('dataPhone').value.trim();
+  if(dataSel.plan===null){ toast('Select a data plan'); return; }
+  if(!phone||phone.length<10){ toast('Invalid phone number'); return; }
+  const plan = DATA_PLANS[dataSel.network][dataSel.plan];
+  openModal(reviewHtml('Data',[['Network',dataSel.network],['Plan',plan.name+' · '+plan.validity],['Phone',phone],['Amount',naira(plan.price)]], ()=>{
+    askPin(async ()=>{
+      const txn = await runTransaction({type:'data', amount:plan.price, meta:{network:dataSel.network, plan:plan.name, phone}});
+      if(txn){ currentModalRef=txn.ref; showPendingThenReceipt(); }
+    });
+  }));
+}
+
+/* ============ ELECTRICITY ============ */
+function openElectricity(){
+  openModal(`<h3>Electricity Bill</h3><label>Distribution company</label>
+  <select id="elecDisco">${DISCOS.map(d=>`<option>${d}</option>`).join('')}</select>
+  <label>Meter type</label><select id="elecType"><option>Prepaid</option><option>Postpaid</option></select>
+  <label>Meter number</label><input id="elecMeter" placeholder="e.g. 04012345678" inputmode="numeric">
+  <button class="btn secondary" onclick="validateMeter()">Validate meter</button>
+  <div id="elecCustomer"></div>`);
+}
+function validateMeter(){
+  const meter = document.getElementById('elecMeter').value.trim();
+  if(!meter||meter.length<6){ toast('Invalid meter number'); return; }
+  document.getElementById('elecCustomer').innerHTML = '<p class="hint">Validating with provider…</p>';
+  setTimeout(()=>{
+    document.getElementById('elecCustomer').innerHTML = `
+    <div class="card" style="margin-top:12px"><div class="rline"><span>Customer</span><span>Chidinma Eze</span></div><div class="rline"><span>Address</span><span>12 Allen Ave, Ikeja</span></div></div>
+    <label>Amount (₦)</label><input id="elecAmt" type="number" placeholder="3000" inputmode="numeric">
+    <button class="btn" onclick="confirmElectricity('${meter}')">Continue</button>`;
+  },900);
+}
+function confirmElectricity(meter){
+  const amt = Number(document.getElementById('elecAmt').value);
+  if(!amt||amt<500){ toast('Enter a valid amount'); return; }
+  const disco = document.getElementById('elecDisco').value, type=document.getElementById('elecType').value;
+  openModal(reviewHtml('Electricity',[['Disco',disco],['Type',type],['Meter',meter],['Customer','Chidinma Eze'],['Amount',naira(amt)]], ()=>{
+    askPin(async ()=>{
+      const txn = await runTransaction({type:'electricity', amount:amt, meta:{disco,meter,customer:'Chidinma Eze'}});
+      if(txn){ currentModalRef=txn.ref; showPendingThenReceipt(); }
+    });
+  }));
+}
+
+/* ============ TV ============ */
+let tvSel={};
+function openTv(provider){ tvSel={provider, pkg:null}; renderTvModal(); }
+function renderTvModal(){
+  openModal(`<h3>${tvSel.provider} Subscription</h3>
+  <label>Smartcard / IUC number</label><input id="tvCard" placeholder="1234567890" inputmode="numeric">
+  <button class="btn secondary" onclick="validateTv()">Validate</button>
+  <div id="tvCustomer"></div>`);
+}
+function validateTv(){
+  const card = document.getElementById('tvCard').value.trim();
+  if(!card||card.length<8){ toast('Invalid smartcard number'); return; }
+  document.getElementById('tvCustomer').innerHTML='<p class="hint">Validating…</p>';
+  setTimeout(()=>{
+    const pkgs = TV_PACKAGES[tvSel.provider];
+    document.getElementById('tvCustomer').innerHTML = `
+    <div class="card" style="margin-top:12px"><div class="rline"><span>Customer</span><span>Tunde Bakare</span></div></div>
+    <label>Package</label>
+    ${pkgs.map((p,i)=>`<div class="plan" id="tvp-${i}" onclick="selTvPkg(${i},'${card}')"><div><div class="pn">${p.name}</div></div><div class="pp">${naira(p.price)}</div></div>`).join('')}
+    <button class="btn" onclick="confirmTv('${card}')">Continue</button>`;
+  },900);
+}
+function selTvPkg(i,card){ tvSel.pkg=i; document.querySelectorAll('.plan').forEach(e=>e.classList.remove('sel')); document.getElementById('tvp-'+i).classList.add('sel'); }
+function confirmTv(card){
+  if(tvSel.pkg===null||tvSel.pkg===undefined){ toast('Select a package'); return; }
+  const pkg = TV_PACKAGES[tvSel.provider][tvSel.pkg];
+  openModal(reviewHtml(tvSel.provider,[['Smartcard',card],['Customer','Tunde Bakare'],['Package',pkg.name],['Amount',naira(pkg.price)]], ()=>{
+    askPin(async ()=>{
+      const txn = await runTransaction({type:'tv', amount:pkg.price, meta:{provider:tvSel.provider,card,package:pkg.name}});
+      if(txn){ currentModalRef=txn.ref; showPendingThenReceipt(); }
+    });
+  }));
+}
+
+/* ============ TRANSFER ============ */
+function openTransfer(){
+  openModal(`<h3>Transfer Money</h3><label>Recipient phone or username</label>
+  <input id="trRecipient" placeholder="080xxxxxxxx or @username">
+  <button class="btn secondary" onclick="lookupRecipient()">Find recipient</button>
+  <div id="trFound"></div>`);
+}
+function lookupRecipient(){
+  const r = document.getElementById('trRecipient').value.trim();
+  if(!r){ toast('Enter a phone or username'); return; }
+  document.getElementById('trFound').innerHTML = `
+  <div class="card" style="margin-top:12px"><div class="rline"><span>Recipient</span><span>Femi Adeyemi</span></div></div>
+  <label>Amount (₦)</label><input id="trAmt" type="number" placeholder="1000" inputmode="numeric">
+  <label>Description (optional)</label><input id="trDesc" placeholder="e.g. Lunch money">
+  <button class="btn" onclick="confirmTransfer()">Continue</button>`;
+}
+function confirmTransfer(){
+  const amt = Number(document.getElementById('trAmt').value);
+  if(!amt||amt<50){ toast('Enter a valid amount'); return; }
+  const desc = document.getElementById('trDesc').value.trim();
+  openModal(reviewHtml('Transfer',[['Recipient','Femi Adeyemi'],['Amount',naira(amt)],['Note',desc||'—']], ()=>{
+    askPin(async ()=>{
+      const txn = await runTransaction({type:'transfer', amount:amt, meta:{recipient:'Femi Adeyemi',desc}});
+      if(txn){ currentModalRef=txn.ref; showPendingThenReceipt(); }
+    });
+  }));
+}
+
+/* ============ REVIEW / RECEIPT ============ */
+function reviewHtml(title, rows, onConfirm){
+  window._pendingConfirm = onConfirm;
+  return `<h3>Confirm ${title}</h3><div class="card" style="margin-top:8px">
+  ${rows.map(r=>`<div class="rline"><span>${r[0]}</span><span>${r[1]}</span></div>`).join('')}
+  </div><button class="btn" onclick="window._pendingConfirm()">Confirm & enter PIN</button>`;
+}
+function showPendingThenReceipt(){
+  openModal(`<div class="receipt pending"><div class="ok">⏳</div><h3>Processing…</h3><p class="hint">Sending request to provider</p></div>`);
+}
+function showReceipt(txn){
+  const cls = txn.status==='successful'?'':(txn.status==='failed'?'failed':'pending');
+  const icon = txn.status==='successful'?'✓':(txn.status==='failed'?'✕':'⏳');
+  const msg = txn.status==='successful'?'Transaction successful':(txn.status==='failed'?'Transaction failed — reversed to wallet':'Transaction pending');
+  openModal(`<div class="receipt ${cls}"><div class="ok">${icon}</div><h3>${msg}</h3><div class="amt">${naira(txn.amount)}</div>
+  <div style="text-align:left;margin-top:14px">
+    <div class="rline"><span>Type</span><span>${labelFor(txn.type)}</span></div>
+    <div class="rline"><span>Reference</span><span>${txn.ref}</span></div>
+    <div class="rline"><span>Provider ref</span><span>${txn.providerRef||'—'}</span></div>
+    <div class="rline"><span>Date</span><span>${new Date(txn.date).toLocaleString('en-NG',{dateStyle:'medium',timeStyle:'short'})}</span></div>
+  </div>
+  <button class="btn" style="margin-top:16px" onclick="closeModal(); go('home')">Done</button>
+  <button class="btn ghost" onclick="toast('Receipt shared')">Share receipt</button></div>`);
+}
+
+/* ============ THEME ============ */
+function toggleTheme(){
+  const r = document.documentElement;
+  r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark' ? 'light':'dark');
+}
+</script>
+</body>
+</html>
